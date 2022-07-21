@@ -1,0 +1,23 @@
+{
+    "name": "@mongez/react-hooks",
+    "version": "1.0.0",
+    "description": "List of react hooks for quicker and easier react app development.",
+    "main": "src/index.ts",
+    "peerDependencies": {
+        "@mongez/events": "^1.x.x",
+        "@mongez/http": "^1.x.x"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hassanzohdy/react-hooks"
+    },
+    "keywords": [
+        "react",
+        "react-hooks"
+    ],
+    "author": "hassanzohdy",
+    "license": "MIT",
+    "devDependencies": {
+        "react": ">=16.0.0"
+    }
+}
