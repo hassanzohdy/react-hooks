@@ -1,6 +1,6 @@
 {
     "name": "@mongez/react-hooks",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "List of react hooks for quicker and easier react app development.",
     "main": "src/index.ts",
     "peerDependencies": {

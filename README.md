@@ -32,9 +32,32 @@ export function HelloWorld() {
 }
 ```
 
+## useRequest
+
+Sometimes we might need to load data from the server, and we need to handle the loading state, the error state, and the success state. This hook will help you to do that.
+
+```tsx
+import { useRequest } from '@mongez/react-hooks';
+import getUserData from './getUserData';
+
+export function HelloWorld() {
+  const { response, loading, error } = useRequest(() => getUserData());
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return <div>{response.data.title}</div>;
+}
+```
+
 ## useFetcher
 
-This is a powerful fetcher hook that will help you to fetch data from the server and handle the loading state and errors.
+This is a powerful fetcher hook that will help you to fetch data from the server and handle the loading state and errors but with more configurations.
 
 ```tsx
 import { useFetcher } from '@mongez/react-hooks';
@@ -282,7 +305,7 @@ export function ParentComponent() {
 function ChildComponent({ disabled }) {
   const [internalDisabled, setDisabled] = useState(disabled);
 
-  return <>Child Component is: {internalDisabled}</>;
+  return <>Child Component is: {internalDisabled ? 'Enabled' : 'Disabled'}</>;
 }
 ```
 
@@ -307,7 +330,7 @@ export function ParentComponent() {
 function ChildComponent({ disabled }) {
   const [internalDisabled, setDisabled] = useStateDetector(disabled);
 
-  return <>Child Component is: {internalDisabled}</>;
+  return <>Child Component is: {internalDisabled ? 'Enabled' : 'Disabled'}</>;
 }
 ```
 
@@ -372,4 +395,5 @@ export function HelloWorld() {
 
 ## TODO
 
-- Added `cache` to `useFetcher` and `useRequest` hook.
+- Adding `cache` to `useFetcher` and `useRequest` hook.
+- Adding Unit Tests for hooks.
