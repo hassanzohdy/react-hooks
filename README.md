@@ -41,7 +41,7 @@ import { useFetcher } from '@mongez/react-hooks';
 import { getProductsList } from './api';
 
 export default function ProductsList() {
-  const {records, isLoading, error, loadMore, goToPage, totalPages, isLastPage, currentPage } = useFetcher(params => getProductList(params));
+  const {records, isLoading, error, loadMore, goToPage } = useFetcher(params => getProductList(params));
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -62,6 +62,79 @@ export default function ProductsList() {
     </>
   );
 }
+```
+
+You can also know which is the current page you're on by using `currentPage` property.
+
+Another cool feature is `paginatable` property which tells you whether you should display the pagination buttons or not.
+
+You might also use `isLastPage` to know if you're on the last page or not so you can disable the `load more` button.
+
+Here are the entire properties you can use:
+
+```tsx
+type FetcherOutput = {
+  records: any[]; // the fetched records
+  error: null | any; // the error if any
+  load: (params?: Record<string, any>) => Promise<any>; // load the data
+  reload: (params?: Record<string, any>) => Promise<any>; // reload the same data
+  isLoading: boolean; // whether the data is loading or not
+  loadMore: (params?: Record<string, any>) => Promise<any>; // load more data
+  goToPage: (page: number) => Promise<any>; // go to a specific page
+  reset: () => Promise<any>; // load the default params 
+  isLastPage: boolean; // whether you're on the last page or not
+  currentPage: number; // the current page you're on
+  response?: AxiosResponse;// the response object
+  totalPages: number; // the total pages
+  totalRecords: number; // the total records
+  currentRecords: number; // the current records
+  defaultParams: Record<string, any>; // the default params that will be passed to the fetcher method on each request beside the current params
+  params: Record<string, any>; // the current params
+  paginatable: boolean; // whether the data is paginatable or not
+}
+```
+
+Also you can set fetching options by passing it as the second argument to the `useFetcher` hook.
+
+```tsx
+const {records, isLoading, error, loadMore, goToPage } = useFetcher(params => getProductList(params), {
+  defaultParams: {
+    page: 1,
+    perPage: 10,
+  },
+});
+```
+
+Or you can set the default params by using `setFetchOptions` method.
+
+```tsx
+import { setFetchOptions } from '@mongez/react-hooks';
+
+setFetchOptions({
+  defaultParams: {
+    page: 1,
+    perPage: 10,
+  }
+});
+```
+
+Here is the entire available options
+
+```ts
+type FetcherOptions = {
+  defaultParams?: Record<string, any>; // the default params that will be passed to the fetcher method on each request beside the current params
+  // the keys that will be taken from the `response.data` object and will be used as the output
+  // it supports dot notation like `paginationInfo.currentPage` or `meta.totalRecords`
+  keys?: {
+    records?: string;
+    itemsPerPage?: string;
+    currentPage?: string;
+    totalPages?: string;
+    totalRecords?: string;
+    currentRecords?: string;
+    pageNumber?: string;
+  };
+};
 ```
 
 ## useInputValue

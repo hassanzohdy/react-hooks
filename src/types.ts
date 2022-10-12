@@ -3,6 +3,8 @@ import { AxiosResponse } from "axios";
 export type FetcherOptions = {
   defaultParams?: Record<string, any>;
   itemsPerPage?: number;
+  // the keys that will be taken from the `response.data` object and will be used as the output
+  // it supports dot notation like `paginationInfo.currentPage` or `meta.totalRecords`
   keys?: {
     records?: string;
     itemsPerPage?: string;
@@ -31,4 +33,5 @@ export type FetcherOutput = {
   currentRecords: number;
   defaultParams: Record<string, any>;
   params: Record<string, any>;
+  paginatable: boolean;
 };

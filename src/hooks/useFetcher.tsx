@@ -1,10 +1,9 @@
 import { Obj } from "@mongez/reinforcements";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FetcherOptions, FetcherOutput } from "../types";
 
 const defaultOptions: FetcherOptions = {
   defaultParams: {},
-  itemsPerPage: 15,
   keys: {
     records: "records",
     itemsPerPage: "paginationInfo.itemsPerPage",
@@ -41,7 +40,6 @@ export default function useFetcher(
     currentRecords: 0,
     defaultParams: fetchOptions.defaultParams || {},
     params: fetchOptions.defaultParams || {},
-    itemsPerPage: fetchOptions.itemsPerPage,
     keys: fetchOptions.keys,
   }));
 
@@ -49,25 +47,27 @@ export default function useFetcher(
     return new Promise((resolve, reject) => {
       fetcher({ ...fetchOptions.defaultParams, ...params })
         .then((response) => {
+          const responseData = response.data;
+
           setSettings({
             ...settings,
             error: null,
             isLoading: false,
             response,
             records: Obj.get(
-              response.data,
+              responseData,
               settings.keys.records || "records",
               []
             ),
-            totalPages: Obj.get(response.data, settings.keys.totalPages, 0),
-            totalRecords: Obj.get(response.data, settings.keys.totalRecords, 0),
+            totalPages: Obj.get(responseData, settings.keys.totalPages, 0),
+            totalRecords: Obj.get(responseData, settings.keys.totalRecords, 0),
             currentRecords: Obj.get(
-              response.data,
+              responseData,
               settings.keys.currentRecords,
               0
             ),
-            itemsPerPage: Obj.get(response.data, settings.keys.itemsPerPage, 0),
-            currentPage: Obj.get(response.data, settings.keys.currentPage, 0),
+            itemsPerPage: Obj.get(responseData, settings.keys.itemsPerPage, 0),
+            currentPage: Obj.get(responseData, settings.keys.currentPage, 0),
             params: { ...params },
           });
           resolve(response);
@@ -83,6 +83,10 @@ export default function useFetcher(
         });
     });
   };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const goToPage = (pageNumber: number) => {
     return load({
@@ -108,5 +112,6 @@ export default function useFetcher(
     reset: () => load(fetchOptions.defaultParams),
     params: settings.params,
     defaultParams: fetchOptions.defaultParams!,
+    paginatable: settings.totalPages > 1,
   };
 }
