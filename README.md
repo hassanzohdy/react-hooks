@@ -265,6 +265,6 @@ export function HelloWorld() {
 }
 ```
 
-## useRequest
+## TODO
 
-> `@mongez/http` must be installed
+- Added `cache` to `useFetcher` and `useRequest` hook.

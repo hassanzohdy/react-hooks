@@ -1,4 +1,4 @@
-import { useEffect, useState, RefObject } from "react";
+import { RefObject, useEffect, useState } from "react";
 
 /**
  * Detect the scroll position of a given element, also watch for scroll position on moving up and down0
@@ -17,11 +17,11 @@ function useScroll(
     let element = ref.current;
     if (!element) return;
 
-    const handleScroll = () => {
-      if (element instanceof Document) {
-        element = element.documentElement;
-      }
+    if (element instanceof Document) {
+      element = element.documentElement;
+    }
 
+    const handleScroll = () => {
       setScroll(element.scrollTop);
     };
     element.addEventListener("scroll", handleScroll);

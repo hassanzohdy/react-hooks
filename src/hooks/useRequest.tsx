@@ -1,7 +1,7 @@
+import { lastRequest } from "@mongez/http";
+import { AxiosResponse } from "axios";
 import React from "react";
 import useOnce from "./useOnce";
-import { AxiosResponse } from "axios";
-import { lastRequest } from "@mongez/http";
 
 type StateType = {
   value: AxiosResponse<any, any> | null;
