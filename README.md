@@ -32,6 +32,36 @@ export function HelloWorld() {
 }
 ```
 
+## useFetcher
+
+This is a powerful fetcher hook that will help you to fetch data from the server and handle the loading state and errors.
+
+```tsx
+import { useFetcher } from '@mongez/react-hooks';
+import { getProductsList } from './api';
+
+export default function ProductsList() {
+  const {records, isLoading, error, loadMore } = useFetcher(params => getProductList(params));
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  return (
+    <>
+      {records.map(product => (
+        <div key={product.id}>{product.name}</div>
+      ))}
+      <button onClick={loadMore}>Load More</button>
+    </>
+  );
+}
+```
+
 ## useInputValue
 
 `useInputValue<T>(defaultValue: T): [T: ((newValue): any => void)]`
