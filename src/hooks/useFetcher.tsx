@@ -27,7 +27,7 @@ export function setFetchOptions(options: Partial<FetcherOptions> = {}) {
  */
 export default function useFetcher(
   fetcher: (params: any) => Promise<any>,
-  options: FetcherOptions
+  options: FetcherOptions = {}
 ): FetcherOutput {
   const fetchOptions = { ...currentOptions, ...options };
 

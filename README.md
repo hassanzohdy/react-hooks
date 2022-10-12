@@ -41,7 +41,7 @@ import { useFetcher } from '@mongez/react-hooks';
 import { getProductsList } from './api';
 
 export default function ProductsList() {
-  const {records, isLoading, error, loadMore } = useFetcher(params => getProductList(params));
+  const {records, isLoading, error, loadMore, goToPage, totalPages, isLastPage, currentPage } = useFetcher(params => getProductList(params));
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -57,6 +57,8 @@ export default function ProductsList() {
         <div key={product.id}>{product.name}</div>
       ))}
       <button onClick={loadMore}>Load More</button>
+
+      <button onClick={() => goToPage(2)}>Go To Page 2</button>
     </>
   );
 }
