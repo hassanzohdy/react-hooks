@@ -105,6 +105,7 @@ type FetcherOutput = {
   loadMore: (params?: Record<string, any>) => Promise<any>; // load more data
   goToPage: (page: number) => Promise<any>; // go to a specific page
   reset: () => Promise<any>; // load the default params 
+  isFirstPage: boolean; // whether you're on the first page or not
   isLastPage: boolean; // whether you're on the last page or not
   currentPage: number; // the current page you're on
   response?: AxiosResponse;// the response object
@@ -159,6 +160,8 @@ type FetcherOptions = {
   };
 };
 ```
+
+You can see the entire documentation of usage in our article in [Dev.to](https://dev.to/hassanzohdy/usefetcher-the-easiest-way-to-fetch-data-in-react-45o9)
 
 ## useInputValue
 

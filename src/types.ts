@@ -26,6 +26,7 @@ export type FetcherOutput = {
   goToPage: (page: number) => Promise<any>;
   reset: () => Promise<any>;
   isLastPage: boolean;
+  isFirstPage: boolean;
   currentPage: number;
   response?: AxiosResponse;
   totalPages: number;

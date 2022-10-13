@@ -104,6 +104,7 @@ export default function useFetcher(
     currentRecords: settings.currentRecords,
     isLoading: settings.isLoading,
     isLastPage: settings.currentPage === settings.totalPages,
+    isFirstPage: settings.currentPage === 1,
     records: settings.records,
     error: settings.error,
     response: settings.response,
