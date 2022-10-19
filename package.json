@@ -1,12 +1,12 @@
 {
     "name": "@mongez/react-hooks",
-    "version": "1.0.6",
+    "version": "1.1.0",
     "description": "List of react hooks for quicker and easier react app development.",
     "main": "src/index.ts",
     "peerDependencies": {
         "axios": "^1.x.x",
         "@mongez/events": "^1.x.x",
-        "@mongez/http": "^1.x.x"
+        "@mongez/http": "^2.x.x"
     },
     "repository": {
         "type": "git",

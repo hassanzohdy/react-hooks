@@ -1,6 +1,10 @@
 export { default as useBooleanState } from "./useBooleanState";
 export { default as useEvent } from "./useEvent";
-export { default as useFetcher, setFetchOptions } from "./useFetcher";
+export {
+  default as useFetcher,
+  getFetchOptions,
+  setFetchOptions,
+} from "./useFetcher";
 export { default as useForceUpdate } from "./useForceUpdate";
 export { default as useInputValue } from "./useInputValue";
 export { default as useOnce } from "./useOnce";

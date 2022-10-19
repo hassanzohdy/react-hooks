@@ -1,6 +1,10 @@
-import { lastRequest } from "@mongez/http";
+import endpoint from "@mongez/http";
+import { Obj } from "@mongez/reinforcements";
 import { AxiosResponse } from "axios";
 import React from "react";
+import responseCacheManager from "../response-cache-manager";
+import { FetcherOptions } from "../types";
+import { getFetchOptions } from "./useFetcher";
 import useOnce from "./useOnce";
 
 type StateType = {
@@ -9,25 +13,47 @@ type StateType = {
   isLoading: boolean;
 };
 
-export default function useRequest(promiseFunction: () => Promise<any>): any {
+export default function useRequest(
+  fetcher: () => Promise<any>,
+  fetchOptions: Pick<FetcherOptions, "expiresAfter"> = {}
+): any {
   const [state, setState] = React.useState<StateType>({
     value: null,
     error: null,
     isLoading: true,
   });
 
+  const updateSettings = (response: any) => {
+    setState({
+      value: response,
+      isLoading: false,
+      error: null,
+    });
+  };
+
   useOnce(() => {
-    promiseFunction()
+    fetchOptions = Obj.merge(fetchOptions, getFetchOptions());
+    const canBeCached = responseCacheManager.canBeCached(fetchOptions);
+
+    let cacheKey = responseCacheManager.cacheKey(fetcher, fetchOptions);
+
+    if (canBeCached) {
+      const response = responseCacheManager.get(cacheKey);
+
+      if (response) {
+        return updateSettings(response);
+      }
+    }
+
+    fetcher()
       .then((response: AxiosResponse) => {
-        setState({
-          value: response,
-          isLoading: false,
-          error: null,
-        });
+        updateSettings(response);
+
+        if (canBeCached) {
+          responseCacheManager.set(cacheKey, response, fetchOptions);
+        }
       })
       .catch((response) => {
-        if (response.__CANCEL__ === true) return;
-
         setState({
           value: null,
           isLoading: false,
@@ -35,13 +61,9 @@ export default function useRequest(promiseFunction: () => Promise<any>): any {
         });
       });
 
-    let request: any;
+    let request: endpoint.getLastRequest;
 
-    setTimeout(() => {
-      request = lastRequest();
-    }, 0);
-
-    return () => request.abort();
+    return () => request?.abort && request.abort();
   });
 
   return {

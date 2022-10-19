@@ -1,9 +1,11 @@
 import { Obj } from "@mongez/reinforcements";
 import { useEffect, useState } from "react";
+import responseCacheManager from "../response-cache-manager";
 import { FetcherOptions, FetcherOutput } from "../types";
 
 const defaultOptions: FetcherOptions = {
   defaultParams: {},
+  expiresAfter: 60 * 5000, // 5 minutes
   keys: {
     records: "records",
     itemsPerPage: "paginationInfo.itemsPerPage",
@@ -21,6 +23,10 @@ export function setFetchOptions(options: Partial<FetcherOptions> = {}) {
   currentOptions = { ...currentOptions, ...options };
 }
 
+export function getFetchOptions() {
+  return currentOptions;
+}
+
 /**
  * Advanced hook to fetch data.
  */
@@ -28,7 +34,9 @@ export default function useFetcher(
   fetcher: (params: any) => Promise<any>,
   options: FetcherOptions = {}
 ): FetcherOutput {
-  const fetchOptions = { ...currentOptions, ...options };
+  const fetchOptions = Obj.merge(currentOptions, options);
+
+  const canBeCached = responseCacheManager.canBeCached(fetchOptions);
 
   const [settings, setSettings] = useState<FetcherOutput>(() => ({
     records: [],
@@ -43,34 +51,46 @@ export default function useFetcher(
     keys: fetchOptions.keys,
   }));
 
+  const updateSettings = (response: any, params: any) => {
+    const responseData = response.data;
+
+    setSettings({
+      ...settings,
+      error: null,
+      isLoading: false,
+      response,
+      records: Obj.get(responseData, settings.keys.records || "records", []),
+      totalPages: Obj.get(responseData, settings.keys.totalPages, 0),
+      totalRecords: Obj.get(responseData, settings.keys.totalRecords, 0),
+      currentRecords: Obj.get(responseData, settings.keys.currentRecords, 0),
+      itemsPerPage: Obj.get(responseData, settings.keys.itemsPerPage, 0),
+      currentPage: Obj.get(responseData, settings.keys.currentPage, 0),
+      params: params,
+    });
+  };
+
   const load = (params: any = {}) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((reject) => {
+      const fetcherParams = { ...fetchOptions.defaultParams, ...params };
+      let cacheKey: string = "";
+
+      if (canBeCached) {
+        cacheKey = responseCacheManager.cacheKey(fetcher, fetcherParams);
+
+        const response = responseCacheManager.get(cacheKey);
+
+        if (response) {
+          return updateSettings(response, fetcherParams);
+        }
+      }
+
       fetcher({ ...fetchOptions.defaultParams, ...params })
         .then((response) => {
-          const responseData = response.data;
+          updateSettings(response, fetcherParams);
 
-          setSettings({
-            ...settings,
-            error: null,
-            isLoading: false,
-            response,
-            records: Obj.get(
-              responseData,
-              settings.keys.records || "records",
-              []
-            ),
-            totalPages: Obj.get(responseData, settings.keys.totalPages, 0),
-            totalRecords: Obj.get(responseData, settings.keys.totalRecords, 0),
-            currentRecords: Obj.get(
-              responseData,
-              settings.keys.currentRecords,
-              0
-            ),
-            itemsPerPage: Obj.get(responseData, settings.keys.itemsPerPage, 0),
-            currentPage: Obj.get(responseData, settings.keys.currentPage, 0),
-            params: { ...params },
-          });
-          resolve(response);
+          if (canBeCached) {
+            responseCacheManager.set(cacheKey, response, fetcherParams);
+          }
         })
         .catch((error) => {
           setSettings({

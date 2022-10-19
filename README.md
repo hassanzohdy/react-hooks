@@ -163,6 +163,46 @@ type FetcherOptions = {
 
 You can see the entire documentation of usage in our article in [Dev.to](https://dev.to/hassanzohdy/usefetcher-the-easiest-way-to-fetch-data-in-react-45o9)
 
+## Request Caching
+
+If you're using `useRequest` or `useFetcher` hooks, you can cache the request by passing `expiresAt` option to the `useRequest` or `useFetcher` hooks.
+
+```tsx
+import { useRequest } from '@mongez/react-hooks';
+
+export function HelloWorld() {
+  const { response, loading, error } = useRequest(() => getUserData(), {
+    expiresAt: 1000 * 60, // 1 minute
+  });
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return <div>{response.data.title}</div>;
+}
+```
+
+This applies also to `useFetcher` hook, by setting `expiresAt` to number of milliseconds the response will be cached for that time, by default it will be 5 minutes `5 * 1000`, if sets to Zero (`0`), then the response will never be cached.
+
+> If you want to cache the response forever, you can set `expiresAt` to `Infinity`.
+
+You can also set the default expiration time by using `setFetchOptions` method.
+
+```tsx
+import { setFetchOptions } from '@mongez/react-hooks';
+
+setFetchOptions({
+  expiresAt: 1000 * 60, // 1 minute , or set it to zero if you want to disable caching
+});
+```
+
+> The response is cached on memory, meaning that if you refresh the page, the cache will be cleared.
+
 ## useInputValue
 
 `useInputValue<T>(defaultValue: T): [T: ((newValue): any => void)]`
@@ -396,7 +436,11 @@ export function HelloWorld() {
 }
 ```
 
+## Change Log
+
+- 1.1.0 (19 Oct 2022)
+  - Added cache feature to `useRequest` and `useFetcher` hooks
+
 ## TODO
 
-- Adding `cache` to `useFetcher` and `useRequest` hook.
 - Adding Unit Tests for hooks.
