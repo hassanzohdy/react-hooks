@@ -5,7 +5,8 @@ import { FetcherOptions, FetcherOutput } from "../types";
 
 const defaultOptions: FetcherOptions = {
   defaultParams: {},
-  expiresAfter: 60 * 5000, // 5 minutes
+  expiresAfter: 0, // disabled
+  cacheKey: null,
   keys: {
     records: "records",
     itemsPerPage: "paginationInfo.itemsPerPage",

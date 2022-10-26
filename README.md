@@ -173,6 +173,7 @@ import { useRequest } from '@mongez/react-hooks';
 export function HelloWorld() {
   const { response, loading, error } = useRequest(() => getUserData(), {
     expiresAt: 1000 * 60, // 1 minute
+    cacheKey: 'hello', // the cache key
   });
 
   if (loading) {
@@ -188,6 +189,8 @@ export function HelloWorld() {
 ```
 
 This applies also to `useFetcher` hook, by setting `expiresAt` to number of milliseconds the response will be cached for that time, by default it will be 5 minutes `5 * 1000`, if sets to Zero (`0`), then the response will never be cached.
+
+> You should always pass a `cacheKey` to fetch options to avoid conflicts with other requests, it can be for example record id.
 
 > If you want to cache the response forever, you can set `expiresAt` to `Infinity`.
 

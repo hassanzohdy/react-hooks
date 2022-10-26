@@ -1,5 +1,5 @@
-import endpoint from "@mongez/http";
-import { Obj } from "@mongez/reinforcements";
+import { getCurrentEndpoint } from "@mongez/http";
+import { merge } from "@mongez/reinforcements";
 import { AxiosResponse } from "axios";
 import React from "react";
 import responseCacheManager from "../response-cache-manager";
@@ -15,7 +15,7 @@ type StateType = {
 
 export default function useRequest(
   fetcher: () => Promise<any>,
-  fetchOptions: Pick<FetcherOptions, "expiresAfter"> = {}
+  fetchOptions: Pick<FetcherOptions, "expiresAfter" | "cacheKey"> = {}
 ): any {
   const [state, setState] = React.useState<StateType>({
     value: null,
@@ -32,7 +32,7 @@ export default function useRequest(
   };
 
   useOnce(() => {
-    fetchOptions = Obj.merge(fetchOptions, getFetchOptions());
+    fetchOptions = merge(getFetchOptions(), fetchOptions);
     const canBeCached = responseCacheManager.canBeCached(fetchOptions);
 
     let cacheKey = responseCacheManager.cacheKey(fetcher, fetchOptions);
@@ -61,7 +61,9 @@ export default function useRequest(
         });
       });
 
-    let request: endpoint.getLastRequest;
+    let endpoint = getCurrentEndpoint();
+
+    let request = endpoint?.getLastRequest;
 
     return () => request?.abort && request.abort();
   });

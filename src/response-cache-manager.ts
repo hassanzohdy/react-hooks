@@ -4,7 +4,9 @@ const cachedResponses: CachedResponses = {};
 
 const responseCacheManager = {
   cacheKey(fetcher: any, params: any) {
-    return JSON.stringify(fetcher) + JSON.stringify(params);
+    return (
+      JSON.stringify(fetcher) + JSON.stringify(params) + (params.cacheKey || "")
+    );
   },
   canBeCached(params: any) {
     return params.expiresAfter > 0;

@@ -11,6 +11,10 @@ export type FetcherOptions = {
   defaultParams?: Record<string, any>;
   itemsPerPage?: number;
   /**
+   * Cache Key
+   */
+  cacheKey?: string;
+  /**
    * Determine if the response should be cached or not.
    *
    * If set to zero (0), the response will never be cached.
