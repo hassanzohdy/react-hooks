@@ -115,5 +115,3 @@ export type RowHandler = {
    */
   update: (newData: any) => void;
 };
-
-export type FormRowsResult = [rows: RowHandler[], addRow: () => void];

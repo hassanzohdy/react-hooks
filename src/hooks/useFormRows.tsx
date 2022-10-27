@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { FormRowsOptions, FormRowsResult, RowHandler } from "../types";
+import { FormRowsOptions, RowHandler } from "../types";
 
 export default function useFormRows(
   { initial, addRow, onAdd, onDelete, onChange, onUpdate }: FormRowsOptions = {
     initial: [],
   }
-): FormRowsResult {
+) {
   const prepareRows = (preparingRows: any) => {
     return (preparingRows || []).map((row, index) => ({
       data: row,
@@ -15,32 +15,37 @@ export default function useFormRows(
     }));
   };
 
-  const [rows, setRows] = useState(prepareRows(initial));
+  const [rows, setRows] = useState<RowHandler[]>(prepareRows(initial));
 
   const addRowCallback = () => {
-    const newRow = (addRow && addRow(rows)) || {};
+    const newRowData = (addRow && addRow(rows)) || {};
 
-    const newRows = prepareRows([...rows, newRow]);
+    const rowIndex = rows.length;
+
+    const newRow = {
+      data: newRowData,
+      index: rowIndex,
+      key: Math.random().toString(36).substring(7),
+    };
+
+    const newRows = [...rows, newRow];
 
     setRows(newRows);
 
-    const rowIndex = newRow.length - 1;
+    onAdd && onAdd(newRow, rowIndex, newRows);
 
-    const finalRow = newRows[rowIndex];
-
-    onAdd && onAdd(finalRow, rowIndex, newRows);
-
-    onChange && onChange(finalRow, "add", rowIndex, newRows);
+    onChange && onChange(newRow, "add", rowIndex, newRows);
   };
 
   const finalRows: RowHandler[] = useMemo(() => {
     return rows.map((row, index) => ({
       ...row,
+      index: index,
       update: (newRow: any) => {
-        let newRows = [...rows];
-        newRows[index] = newRow;
+        if (newRow === finalRows[index].data) return;
 
-        newRows = prepareRows(newRows);
+        const newRows = [...rows];
+        newRows[index].data = newRow;
 
         setRows(newRows);
 
@@ -50,7 +55,12 @@ export default function useFormRows(
       },
       remove: () => {
         rows.splice(index, 1);
-        const newRows = [...prepareRows(rows)];
+
+        const newRows = [...rows].map((row, index) => ({
+          ...row,
+          index,
+        }));
+
         setRows(newRows);
 
         onDelete && onDelete(row, index, newRows);
@@ -60,5 +70,9 @@ export default function useFormRows(
     }));
   }, [rows, onDelete]);
 
-  return [finalRows, addRowCallback];
+  const setRowCallback = (rows: any) => {
+    setRows(prepareRows(rows));
+  };
+
+  return [finalRows, addRowCallback, setRowCallback] as const;
 }

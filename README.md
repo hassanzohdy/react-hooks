@@ -651,6 +651,84 @@ export function HelloWorld() {
 
 > Kindly note that the `rowHandler` that is passed to the `onAdd`, `onUpdate`, `onDelete` and `onChange` hooks is not that actual data, if you want to access it destruct it and get from `data` key.
 
+If you would like to set update the rows later on, you can use `setRows` function.
+
+```tsx
+import { useFormRows } from "@mongez/react-hooks";
+
+export function HelloWorld() {
+  const [rows, addRow, setRows] = useFormRows({
+    initial: [],
+    addRow: () => ({
+      price: '',
+      option: ''
+    })
+  });
+
+  return (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map({ key, data, delete, update }) => (
+            <tr key={key}>
+              <td>
+                <input
+                  value={data.option}
+                  name="option"
+                  placeholder="Option"
+                  onChange={(e) => {
+                    update({
+                      ...data,
+                      option: e.target.value
+                    });
+                  }}
+                />
+              </td>
+              <td>
+                <input
+                  value={data.price}
+                  name="price"
+                  placeholder="Price"
+                  onChange={(e) => {
+                    update({
+                      ...data,
+                      price: e.target.value
+                    });
+                  }}
+                />
+              </td>
+              <td>
+                <button onClick={remove}>Remove</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={addRow}>Add Row</button>
+      <button onClick={() => {
+        setRows([
+          {
+            price: '100',
+            option: 'Option 1'
+          },
+          {
+            price: '200',
+            option: 'Option 2'
+          }
+        ]);
+      }}>Set Rows</button>
+    </>
+  );
+}
+```
+
 ## Change Log
 
 - 1.2.0 (27 Oct 2022)
