@@ -729,8 +729,170 @@ export function HelloWorld() {
 }
 ```
 
+## useCachedRows
+
+> Added in v1.3.0
+
+Using `useFormRows` will help you manage your rows in your form either in updating or deleting, the issue we might find here is each time the row is updated, it will cause a full re-render for the component that called `useFormRows`, the solution for this is to use `useCachedRows` hook.
+
+`useCachedRows` will cache the rows in a state and will only update the row that is being updated, this will help you avoid re-rendering the whole component.
+
+```tsx
+import React from "react";
+import { useFormRows, useCachedRows } from "@mongez/react-hooks";
+
+export function HelloWorld() {
+  const [rows, addRow] = useFormRows({
+    initial: [],
+    addRow: () => ({
+      price: '',
+      option: ''
+    }),
+  });
+
+  const rowCallback = ({ key, data, delete, update }) => {
+    return (
+      <tr key={key}>
+        <td>
+          <input
+            value={data.option}
+            name="option"
+            placeholder="Option"
+            onChange={(e) => {
+              update({
+                ...data,
+                option: e.target.value
+              });
+            }}
+          />
+        </td>
+        <td>
+          <input
+            value={data.price}
+            name="price"
+            placeholder="Price"
+            onChange={(e) => {
+              update({
+                ...data,
+                price: e.target.value
+              });
+            }}
+          />
+        </td>
+        <td>
+          <button onClick={remove}>Remove</button>
+        </td>
+      </tr>      
+    )
+  });
+
+  const cachedRows = useCachedRows(rows, rowCallback);
+
+  return (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cachedRows}
+        </tbody>
+      </table>
+      <button onClick={addRow}>Add Row</button>
+    </>
+  );
+}
+```
+
+Add `console.log` in the component and now update any value in any input, it will be printed only when adding or removing the row, but updating the row won't console anything!
+
+Now when calling `update` it will only update that row, not the original row data, however you can also call `fullUpdate` instead, this will update the current row's value and update it as well in the rows list, which will cause a full re-render to the component.
+
+```tsx
+import React from "react";
+import { useFormRows, useCachedRows } from "@mongez/react-hooks";
+
+export function HelloWorld() {
+  const [rows, addRow] = useFormRows({
+    initial: [],
+    addRow: () => ({
+      price: '',
+      option: ''
+    }),
+  });
+
+  const rowCallback = ({ key, data, delete, fullUpdate }) => {
+    return (
+      <tr key={key}>
+        <td>
+          <input
+            value={data.option}
+            name="option"
+            placeholder="Option"
+            onChange={(e) => {
+              fullUpdate({
+                ...data,
+                option: e.target.value
+              });
+            }}
+          />
+        </td>
+        <td>
+          <input
+            value={data.price}
+            name="price"
+            placeholder="Price"
+            onChange={(e) => {
+              fullUpdate({
+                ...data,
+                price: e.target.value
+              });
+            }}
+          />
+        </td>
+        <td>
+          <button onClick={remove}>Remove</button>
+        </td>
+      </tr>      
+    )
+  };
+
+  const cachedRows = useCachedRows(rows, rowCallback);
+
+  return (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cachedRows}
+        </tbody>
+      </table>
+      <button onClick={addRow}>Add Row</button>
+      <button onClick={() => {
+        updateRows({
+          price: '100',
+          option: 'Option 1'
+        });
+      }}>Update Rows</button>
+    </>
+  );
+}
+```
+
 ## Change Log
 
+- 1.3.0 (27 Oct 2022)
+  - Added `useCachedRows` hooks.
 - 1.2.0 (27 Oct 2022)
   - Added `useFormRows` hooks.
 - 1.1.0 (19 Oct 2022)

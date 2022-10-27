@@ -1,4 +1,5 @@
 export { default as useBooleanState } from "./useBooleanState";
+export { default as useCachedRows } from "./useCachedRows";
 export { default as useEvent } from "./useEvent";
 export {
   default as useFetcher,

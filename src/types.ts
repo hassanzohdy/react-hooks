@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+import React from "react";
 
 export type ResponseCache = {
   expiresAt: number;
@@ -114,4 +115,18 @@ export type RowHandler = {
    * Update row data
    */
   update: (newData: any) => void;
+};
+
+// useCachedRows Hook types
+export type CachedRowHandler = RowHandler & {
+  fullUpdate: (newRows: any) => void;
+};
+
+export type CachedRowCallback = (
+  rowHandler: CachedRowHandler
+) => React.ReactNode;
+
+export type CachedRowProps = {
+  row: RowHandler;
+  callback: CachedRowCallback;
 };
