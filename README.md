@@ -439,8 +439,222 @@ export function HelloWorld() {
 }
 ```
 
+## useFormRows
+
+> Added in v1.2.0
+
+Sometimes form can get complex and you need to add multiple inputs in multiple rows, for example in a table to make user add product options, each option has its own price, things will be very messy to make such a table.
+
+Luckily we have `useFormRows` hook to help you with that.
+
+```tsx
+import { useFormRows } from "@mongez/react-hooks";
+
+export function HelloWorld() {
+  const [rows, addRow] = useFormRows({
+    initial: [],
+    addRow: () => ({
+      price: '',
+      option: ''
+    })
+  });
+
+  return (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map({ key, data, delete }) => (
+            <tr key={key}>
+              <td>
+                <input
+                  defaultValue={data.option}
+                  name="option"
+                  placeholder="Option"
+                />
+              </td>
+              <td>
+                <input
+                  defaultValue={data.price}
+                  name="price"
+                  placeholder="Price"
+                />
+              </td>
+              <td>
+                <button onClick={remove}>Remove</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={addRow}>Add Row</button>
+    </>
+  );
+}
+```
+
+So basically the `useFormRows` hook will return an array of rows and a `addRow` callback, each row has a `key` which is a unique id for that row, `row` which is the actual row data and `delete` function to delete that row.
+
+The delete function will be called automatically when the user clicks on the delete button and will cause a rerender.
+
+We can also update the row, for example if we're working with controlled values using `update` function.
+
+```tsx
+import { useFormRows } from "@mongez/react-hooks";
+
+export function HelloWorld() {
+  const [rows, addRow] = useFormRows({
+    initial: [],
+    addRow: () => ({
+      price: '',
+      option: ''
+    })
+  });
+
+  return (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map({ key, data, delete, update }) => (
+            <tr key={key}>
+              <td>
+                <input
+                  value={data.option}
+                  name="option"
+                  placeholder="Option"
+                  onChange={(e) => {
+                    update({
+                      ...data,
+                      option: e.target.value
+                    });
+                  }}
+                />
+              </td>
+              <td>
+                <input
+                  value={data.price}
+                  name="price"
+                  placeholder="Price"
+                  onChange={(e) => {
+                    update({
+                      ...data,
+                      price: e.target.value
+                    });
+                  }}
+                />
+              </td>
+              <td>
+                <button onClick={remove}>Remove</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={addRow}>Add Row</button>
+    </>
+  );
+}
+```
+
+The hook also provides you multiple hooks that you can listen to for any changes, `onAdd`, `onUpdate`, `onDelete` and `onChange`.
+
+`onAdd` will be called when the user clicks on the add button, `onUpdate` will be called when the user updates a row, `onDelete` will be called when the user deletes a row and `onChange` will be called when any of the above happens.
+
+```tsx
+import { useFormRows } from "@mongez/react-hooks";
+
+export function HelloWorld() {
+  const [rows, addRow] = useFormRows({
+    initial: [],
+    addRow: () => ({
+      price: '',
+      option: ''
+    }),
+    onAdd: (rowHandler, rowIndex, rows) => {
+      console.log('New row added', row);
+    },
+    onUpdate: (rowHandler, rowIndex, rows) => {
+      console.log('Row updated', row);
+    },
+    onDelete: (rowHandler, rowIndex, rows) => {
+      console.log('Row deleted', row);
+    },
+    onChange: (rowHandler, state: 'add' | 'update' | 'delete' | rowIndex, rows) => {
+      console.log('Rows changed', rows);
+    }
+  });
+
+  return (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map({ key, data, delete, update }) => (
+            <tr key={key}>
+              <td>
+                <input
+                  value={data.option}
+                  name="option"
+                  placeholder="Option"
+                  onChange={(e) => {
+                    update({
+                      ...data,
+                      option: e.target.value
+                    });
+                  }}
+                />
+              </td>
+              <td>
+                <input
+                  value={data.price}
+                  name="price"
+                  placeholder="Price"
+                  onChange={(e) => {
+                    update({
+                      ...data,
+                      price: e.target.value
+                    });
+                  }}
+                />
+              </td>
+              <td>
+                <button onClick={remove}>Remove</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={addRow}>Add Row</button>
+    </>
+  );
+}
+```
+
+> Kindly note that the `rowHandler` that is passed to the `onAdd`, `onUpdate`, `onDelete` and `onChange` hooks is not that actual data, if you want to access it destruct it and get from `data` key.
+
 ## Change Log
 
+- 1.2.0 (27 Oct 2022)
+  - Added `useFormRows` hooks.
 - 1.1.0 (19 Oct 2022)
   - Added cache feature to `useRequest` and `useFetcher` hooks
 
