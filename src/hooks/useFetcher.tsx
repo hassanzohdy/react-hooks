@@ -1,4 +1,4 @@
-import { Obj } from "@mongez/reinforcements";
+import { merge } from "@mongez/reinforcements";
 import { useEffect, useState } from "react";
 import responseCacheManager from "../response-cache-manager";
 import { FetcherOptions, FetcherOutput } from "../types";
@@ -35,7 +35,7 @@ export default function useFetcher(
   fetcher: (params: any) => Promise<any>,
   options: FetcherOptions = {}
 ): FetcherOutput {
-  const fetchOptions = Obj.merge(currentOptions, options);
+  const fetchOptions = merge(currentOptions, options);
 
   const canBeCached = responseCacheManager.canBeCached(fetchOptions);
 
